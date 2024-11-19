@@ -84,88 +84,123 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class JobDescription(BaseModel):
     description: str
     num_candidates: int
 
 
 def analyze_job_description(description: str, num: int) -> str:
-    TWEAKS = {
-        "SearchAPI-8xIft": {
-            "api_key": "inj2Dp5uDNHjEdMn9fTLho6u",
-            "engine": "google",
-            "input_value": "",
-            "max_results": 5,
-            "max_snippet_length": 100,
-            "search_params": {}
-        },
-        "url_content_fetcher-bDGCl": {
-            "fetch_params": {},
-            "url": ""
-        },
-        "ToolCallingAgent-5Q0Er": {
-            "handle_parsing_errors": True,
-            "input_value": "",
-            "max_iterations": 15,
-            "system_prompt": agent_system_prompt,
-            "user_prompt": "{input}",
-            "verbose": True
-        },
-        "CustomComponent-W7bsk": {
-            "input_value": ""
-        },
-        "URL-YhNkF": {
-            "format": "Text",
-            "urls": ""
-        },
-        "Prompt-W93bF": {
-            "template": filter_prompt,
-            "candidates": "",
-            "job_description": "",
-            "n": ""
-        },
-        "TextInput-Mijxy": {
-            "input_value": str(num)
-        },
-        "TextInput-JyTyM": {
-            "input_value": description
-        },
-        "AzureOpenAIModel-rRgMw": {
-            "api_key": "d26cf6f9ccd34426b28079b675ac40f9",
-            "api_version": "2023-03-15-preview",
-            "azure_deployment": "gpt-4o-mini",
-            "azure_endpoint": "https://unilink-gpt.openai.azure.com/",
-            "input_value": "",
-            "max_tokens": None,
-            "stream": False,
-            "system_message": "",
-            "temperature": 0.7
-        },
-        "Prompt-sLi4Q": {
-            "template": agent_user_prompt,
-            "candidates": "",
-            "n": "",
-            "description": ""
-        },
-        "TextOutput-jhX8N": {
-            "input_value": ""
-        }
+    # Mock result that matches the expected JSON structure
+    mock_result = {
+        "candidates": [
+            {
+                "name": "Jane Smith",
+                "summary": "Jane Smith is a senior Computer Science student at MIT with extensive experience in machine learning and software development. She completed internships at Google and Microsoft, where she worked on large-scale distributed systems. She has published research on natural language processing and maintains several popular open-source projects. Her technical expertise combined with leadership experience as president of MIT's AI Club makes her an excellent candidate.",
+                "relevant_urls": [
+                    "https://www.linkedin.com/in/janesmith",
+                    "https://github.com/janesmith",
+                    "https://scholar.google.com/citations?user=JS123",
+                    "https://mit.edu/~jsmith/research",
+                    "https://medium.com/@janesmith",
+                ],
+            },
+            {
+                "name": "John Doe",
+                "summary": "John Doe is a recent graduate from Stanford University with a focus on distributed systems and cloud computing. He has built several successful tech startups and has experience scaling applications on AWS. His projects have been featured in TechCrunch and he was a finalist in Y Combinator's Summer 2023 batch.",
+                "relevant_urls": [
+                    "https://www.linkedin.com/in/johndoe",
+                    "https://github.com/johndoe",
+                    "https://techcrunch.com/2023/startup-feature",
+                    "https://stanford.edu/projects/cloud-computing",
+                    "https://medium.com/@johndoe",
+                ],
+            },
+        ],
+        "flow": [
+            "Searched 'Jane Smith MIT AI research'",
+            "Found LinkedIn profile and GitHub repositories",
+            "Discovered published papers on Google Scholar",
+            "Searched 'John Doe Stanford startup'",
+            "Found TechCrunch article and Y Combinator profile",
+            "Analyzed GitHub contributions and technical blog posts",
+        ],
     }
-    result = run_flow_from_json(flow="unlink-agent.json",
-                        input_value="message",
-                        session_id="", # provide a session id if you want to use session state
-                        fallback_to_env_vars=True, # False by default
-                        tweaks=TWEAKS)[0].outputs[0].results['text'].data['text']
-    
-    # Trim characters from start until we find opening brace
-    while result and not result.startswith('{'):
-        result = result[1:]
-        
-    # Trim characters from end until we find closing brace
-    while result and not result.endswith('}'):
-        result = result[:-1]
-        
-    return result
+
+    return json.dumps(mock_result)
+
+
+# def analyze_job_description(description: str, num: int) -> str:
+#     TWEAKS = {
+#         "SearchAPI-8xIft": {
+#             "api_key": "Spzu9Rgz6wM7yg9DoHewo91p",
+#             "engine": "google",
+#             "input_value": "",
+#             "max_results": 5,
+#             "max_snippet_length": 100,
+#             "search_params": {},
+#         },
+#         "url_content_fetcher-bDGCl": {"fetch_params": {}, "url": ""},
+#         "ToolCallingAgent-5Q0Er": {
+#             "handle_parsing_errors": True,
+#             "input_value": "",
+#             "max_iterations": 15,
+#             "system_prompt": agent_system_prompt,
+#             "user_prompt": "{input}",
+#             "verbose": True,
+#         },
+#         "CustomComponent-W7bsk": {"input_value": ""},
+#         "URL-YhNkF": {"format": "Text", "urls": ""},
+#         "Prompt-W93bF": {
+#             "template": filter_prompt,
+#             "candidates": "",
+#             "job_description": "",
+#             "n": "",
+#         },
+#         "TextInput-Mijxy": {"input_value": str(num)},
+#         "TextInput-JyTyM": {"input_value": description},
+#         "AzureOpenAIModel-rRgMw": {
+#             "api_key": "d26cf6f9ccd34426b28079b675ac40f9",
+#             "api_version": "2023-03-15-preview",
+#             "azure_deployment": "gpt-4o-mini",
+#             "azure_endpoint": "https://unilink-gpt.openai.azure.com/",
+#             "input_value": "",
+#             "max_tokens": None,
+#             "stream": False,
+#             "system_message": "",
+#             "temperature": 0.7,
+#         },
+#         "Prompt-sLi4Q": {
+#             "template": agent_user_prompt,
+#             "candidates": "",
+#             "n": "",
+#             "description": "",
+#         },
+#         "TextOutput-jhX8N": {"input_value": ""},
+#     }
+#     result = (
+#         run_flow_from_json(
+#             flow="unlink-agent.json",
+#             input_value="message",
+#             # session_id="",  # provide a session id if you want to use session state
+#             fallback_to_env_vars=True,  # False by default
+#             tweaks=TWEAKS,
+#         )[0]
+#         .outputs[0]
+#         .results["text"]
+#         .data["text"]
+#     )
+
+#     # Trim characters from start until we find opening brace
+#     while result and not result.startswith("{"):
+#         result = result[1:]
+
+#     # Trim characters from end until we find closing brace
+#     while result and not result.endswith("}"):
+#         result = result[:-1]
+
+#     return result
+
 
 @app.post("/analyze")
 def create_analysis(job: JobDescription, db: Session = Depends(get_db)):
@@ -176,7 +211,15 @@ def create_analysis(job: JobDescription, db: Session = Depends(get_db)):
     db.refresh(db_analysis)
     return db_analysis
 
+
 @app.get("/analyses")
 def get_analyses(db: Session = Depends(get_db)):
     analyses = db.query(models.JobAnalysis).all()
-    return [{"id": analysis.id, "description": analysis.description, "result": json.loads(analysis.result)} for analysis in analyses]
+    return [
+        {
+            "id": analysis.id,
+            "description": analysis.description,
+            "result": json.loads(analysis.result),
+        }
+        for analysis in analyses
+    ]
