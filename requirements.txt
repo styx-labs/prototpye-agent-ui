@@ -1,4 +1,9 @@
 fastapi
 sqlalchemy
 uvicorn
-langflow
+langchain
+langchain-openai
+python-dotenv
+nltk
+requests
+re
